@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <ul id="content-list"></ul>
+    <textarea name="" id="content" cols="30" rows="10"></textarea>
+    <button id="btn-send">发送</button>
+    <script src="node_modules/socket.io-client/dist/socket.io.js"></script>
+    <script>  
+        const cl = document.getElementById('content-list')
+        const content = document.getElementById('content')
+        const btn = document.getElementById('btn-send')
+        // 客户端中使用io.connect连接服务器
+        //连接时指定频道:
+        var  socket = io.connect('http://localhost:3001?chan=php');
+
+        //连接成功之后,就可以使用on来绑定事件了
+        socket.on('connect',()=>{
+            console.log('连接成功!')
+            cl.innerHTML += '<li>连接成功!</li>'
+        })
+        //也可以用on来监听断开连接
+        socket.on('disconnect',()=>{
+            console.log('断开连接')
+            cl.innerHTML += '<li>断开连接!</li>'
+        })
+
+        //可以使用on来监听一个频道
+        //只接受本频道的消息,并且只向本频道发消息
+        socket.on('php',data=>{
+            console.log('收到消息:'+data)
+            cl.innerHTML += '<li>'+data+'</li>'
+        })
+        
+        btn.onclick = ()=>{
+            socket.emit('php',content.value)
+            content.value = ''
+        }
+    </script>
+</body>
+</html>
